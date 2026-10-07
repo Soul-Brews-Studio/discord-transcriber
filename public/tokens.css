@@ -1,0 +1,103 @@
+/* Hallmark · tokens · one accent, four grounds
+ *
+ * The previous ramp was tuned to pass 4.5:1 and most of the page sat in the
+ * 4.5–7 band — compliant and uncomfortable. This one targets 7:1 for body text
+ * against the surface it actually sits on, and the type scale starts at 13px
+ * instead of 11px, because 150 of 179 text elements were 11–13px.
+ *
+ * The ground is selectable. Every surface, rule and text step is one lightness
+ * plus a shared hue and saturation, so a theme is two numbers and nothing else
+ * moves. Lightness is deliberately identical across all four: contrast in OKLCH
+ * tracks L, so holding L fixed keeps the measured ratios from drifting when the
+ * hue turns. Chroma stays under 0.035 for the same reason — measured per theme,
+ * not assumed (scripts/contrast-audit.mjs samples rendered pixels).
+ *
+ * No webfonts: the CSP is `default-src 'self'` and a loopback page has no
+ * business fetching a font to render itself.
+ */
+:root {
+  /* The ground, as two numbers. Overridden by [data-bg] below. */
+  --bg-hue: 240;
+  --bg-sat: 1;
+
+  /* Surfaces — a wider spread so elevation reads without alpha tricks */
+  --color-paper:    oklch(16% calc(0.010 * var(--bg-sat)) var(--bg-hue));
+  --color-paper-2:  oklch(21% calc(0.012 * var(--bg-sat)) var(--bg-hue));
+  --color-paper-3:  oklch(26% calc(0.013 * var(--bg-sat)) var(--bg-hue));
+
+  /* Lines */
+  --color-rule:     oklch(34% calc(0.014 * var(--bg-sat)) var(--bg-hue));
+  --color-rule-2:   oklch(46% calc(0.016 * var(--bg-sat)) var(--bg-hue));
+
+  /* Text — every step measured against paper and paper-2, not guessed.
+     muted is the floor for secondary copy and clears 7:1 on both. */
+  --color-muted:    oklch(76% calc(0.014 * var(--bg-sat)) var(--bg-hue));
+  --color-muted-2:  oklch(80% calc(0.013 * var(--bg-sat)) var(--bg-hue));
+  --color-ink-2:    oklch(88% calc(0.010 * var(--bg-sat)) var(--bg-hue));
+  --color-ink:      oklch(97% calc(0.006 * var(--bg-sat)) var(--bg-hue));
+
+  /* One accent, cool blue, and it does NOT follow the ground. Status colour has
+     to mean the same thing on every theme; a "live" that shifts hue with the
+     background is decoration pretending to be signal. Chosen to sit far from
+     the amber warning and the red error, so a glance never has to decide
+     whether a colour means "live" or "look at this". Light enough to carry
+     text, not only borders. */
+  --color-accent:   oklch(78% 0.135 250);
+  --color-accent-dim: oklch(68% 0.095 250);
+  --color-focus:    oklch(84% 0.140 250);
+
+  /* Status stays separable by hue — a console must distinguish these. */
+  --color-warn:     oklch(85% 0.135 80);
+  --color-danger:   oklch(78% 0.165 25);
+
+  /* Go. Used only while something is being dragged, to say which rooms will
+     accept it. Green is not in the resting palette on purpose — it earns its
+     place here because "you may drop this" is the one moment the page needs a
+     word the accent does not already spend on "live", "selected" and "joined". */
+  --color-go:       oklch(80% 0.145 150);
+  --color-go-dim:   oklch(62% 0.085 150);
+
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --font-body: system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Type starts at 13px. Nothing below it carries meaning a user must read. */
+  --text-xs:   0.8125rem;
+  --text-sm:   0.875rem;
+  --text-base: 0.9375rem;
+  --text-lg:   1.0625rem;
+  --text-xl:   1.25rem;
+  --text-2xl:  1.5rem;
+
+  --space-2xs: 4px;  --space-xs:  8px;  --space-sm:  12px;
+  --space-md:  16px; --space-lg:  24px; --space-xl:  32px;
+  --space-2xl: 48px; --space-3xl: 64px;
+
+  --rule-hair: 1px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+
+  --dur-fast: 90ms;
+  --dur-base: 160ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in:  cubic-bezier(0.64, 0, 0.78, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* The four grounds. Cobalt is :root's default, repeated here so the attribute is
+   never a no-op the picker has to special-case. No green ground: the accent is
+   blue and the warning amber, and a green surface puts a third hue family behind
+   both for no gain.
+
+   Not scoped to :root. Any element carrying data-bg rebinds the two numbers for
+   itself, which is how a swatch in the picker paints the theme it selects while
+   the page still wears another one. */
+[data-bg="cobalt"] { --bg-hue: 240; --bg-sat: 1; }    /* blue-black, the original */
+[data-bg="slate"]  { --bg-hue: 250; --bg-sat: 0.2; }  /* near-neutral, almost no tint */
+[data-bg="plum"]   { --bg-hue: 315; --bg-sat: 1.5; }  /* cool violet */
+[data-bg="umber"]  { --bg-hue: 55;  --bg-sat: 1.4; }  /* warm brown-black */
+
+/* The surface tokens above are declared on :root, so they compute there and
+   inherit already-resolved — a child's own --bg-hue cannot reach back into them.
+   The swatch therefore needs its own declaration, on the element that carries
+   the attribute. Same two numbers, same formula as --color-paper-2. */
+[data-bg] { --swatch: oklch(21% calc(0.012 * var(--bg-sat)) var(--bg-hue)); }

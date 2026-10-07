@@ -1,0 +1,30 @@
+{
+  "name": "discord-transcriber",
+  "private": true,
+  "version": "26.9.27-alpha.1120",
+  "type": "module",
+  "scripts": {
+    "start": "bun run src/server.ts",
+    "test": "bun test",
+    "check": "tsc --noEmit",
+    "vendor": "bun build .vendor-entry.js --target=browser --minify --outfile=public/vendor/react.js && cp node_modules/@tailwindcss/browser/dist/index.global.js public/vendor/tailwind.js"
+  },
+  "engines": {
+    "node": ">=24.17.0"
+  },
+  "dependencies": {
+    "@discordjs/voice": "0.19.2",
+    "discord.js": "14.26.4",
+    "elysia": "^1.4.30",
+    "opusscript": "0.1.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/browser": "^4.3.3",
+    "@types/bun": "latest",
+    "htm": "^3.1.1",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "typescript": "^5.6.0"
+  },
+  "license": "Apache-2.0"
+}

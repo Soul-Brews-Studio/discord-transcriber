@@ -1,0 +1,243 @@
+/* Hallmark · macrostructure: Map / Diagram · theme: Terminal · genre: atmospheric
+ * Tailwind (browser build) owns layout and component classes; this file keeps
+ * only what a utility class cannot express: the token import, the page ground,
+ * and the meter's vendor pseudo-elements.
+ */
+@import url("/tokens.css");
+
+html, body {
+  overflow-x: clip;          /* clip, never hidden */
+  margin: 0;
+}
+
+html { color-scheme: dark; }
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.55;
+}
+
+/* The parts nobody draws still carry the design. Selection, the caret, the
+   scrollbar and the focus ring all ship with browser defaults that belong to
+   no palette — theming them is the cheapest signal the page was built rather
+   than assembled. */
+::selection {
+  background: color-mix(in oklab, var(--color-accent) 30%, transparent);
+  color: var(--color-ink);
+}
+
+:root { accent-color: var(--color-accent); caret-color: var(--color-accent); }
+
+* { scrollbar-color: var(--color-rule-2) transparent; scrollbar-width: thin; }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--color-rule-2);
+  border: 3px solid var(--color-paper);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--color-muted); }
+
+/* One ring, everywhere, never animated in. */
+:where(a, button, select, input, summary, details, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Data reads as data: one set of numerals, aligned. */
+:root { font-variant-numeric: tabular-nums; }
+
+/* While the bot is being carried the cursor says so everywhere, not only over
+   the chip — pointer capture keeps the events on the chip, but the cursor over
+   the rest of the page would otherwise stay a plain arrow. */
+.dragging-bot, .dragging-bot * { cursor: grabbing !important; }
+
+/* A meter's fill lives behind vendor pseudo-elements Tailwind cannot reach. */
+meter {
+  appearance: none;
+  background: var(--color-paper-3);
+  border: 0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+meter::-webkit-meter-bar {
+  background: var(--color-paper-3);
+  border: 0;
+  border-radius: 999px;
+}
+
+meter::-webkit-meter-optimum-value,
+meter::-moz-meter-bar {
+  background: var(--color-accent);
+  transition: inline-size var(--dur-fast) linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* ── The live monitor, in its own window ──────────────────────────────────
+ *
+ * Written out rather than composed from utilities. Tailwind's browser build
+ * watches THIS document, so a class used only inside the picture-in-picture
+ * window is never compiled — the markup would land there with no styles at all.
+ * These are plain rules on the same tokens, which the PiP document gets by
+ * linking tokens.css and carrying the page's own data-bg.
+ */
+.live-body {
+  margin: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.live-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  /* The panel is the window, so the log inside it can own the leftover space
+     and scroll. Without a height here it grows and the scroll never happens. */
+  block-size: 100vh;
+  box-sizing: border-box;
+}
+
+.live-room {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  color: var(--color-accent);
+  overflow-wrap: anywhere;
+}
+.live-room[data-idle] { color: var(--color-muted); }
+
+.live-people { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 2px; }
+
+.live-person {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  color: var(--color-ink-2);
+  overflow-wrap: anywhere;
+}
+
+/* Speaking is carried by the dot AND the weight — one channel is a colour a
+   glance can miss, and this window is nothing but glances. */
+.live-person[data-speaking] { color: var(--color-accent); font-weight: 600; }
+
+.live-dot {
+  inline-size: 8px;
+  block-size: 8px;
+  flex: none;
+  border-radius: 999px;
+  background: var(--color-rule-2);
+}
+.live-person[data-speaking] .live-dot { background: var(--color-accent); }
+
+.live-tag {
+  margin-inline-start: auto;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--color-muted);
+}
+
+.live-meter { inline-size: 100%; block-size: 6px; display: block; }
+
+.live-facts {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+  overflow-wrap: anywhere;
+}
+
+/* The transcript scrolls; the room, the people and the counters above it do
+   not. A window this small has to keep its header still or the thing you are
+   reading moves while you read it. */
+.live-log {
+  margin: 0;
+  padding: var(--space-xs) 0 0;
+  list-style: none;
+  border-block-start: var(--rule-hair) solid var(--color-rule);
+  overflow-y: auto;
+  min-block-size: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.live-entry + .live-entry {
+  padding-block-start: var(--space-xs);
+  border-block-start: var(--rule-hair) solid var(--color-rule);
+}
+
+/* Newest at the top, so the one that just arrived is where the eye already is.
+   Older lines fade rather than disappear — they are context, not the subject. */
+.live-entry:not(:first-child) .live-line { color: var(--color-ink-2); }
+.live-entry:not(:first-child) .live-meta { color: var(--color-rule-2); }
+
+/* Who and when, in the same voice the transcript rows use, so the window and
+   the page do not describe the same line two different ways. */
+.live-meta {
+  margin: 0 0 2px;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--color-muted);
+}
+
+.live-line { margin: 0; overflow-wrap: anywhere; }
+
+.live-quiet { margin: 0; font-size: var(--text-xs); color: var(--color-muted); }
+
+/* ── While something is being carried ─────────────────────────────────────
+ *
+ * A room you cannot enter should look like one, before the drop rather than
+ * after it. Voice membership is per server, so dragging yourself can only land
+ * inside the server you are already connected to — every other card goes quiet
+ * and the reachable ones go green.
+ *
+ * Dimmed by colour, never by opacity. Opacity composites against whatever is
+ * behind it, which is how this page once reported 6.54:1 for text that measured
+ * 2.14:1 — the numbers below are the colours that actually render.
+ */
+.dragging-bot [data-zone][data-droppable='no'] > div {
+  border-color: var(--color-rule);
+  background: var(--color-paper);
+}
+
+.dragging-bot [data-zone][data-droppable='no'] :where(span, b, p, li) {
+  color: var(--color-muted);
+}
+
+.dragging-bot [data-zone][data-droppable='yes'] > div {
+  border-color: var(--color-go-dim);
+  background: color-mix(in oklab, var(--color-go) 7%, var(--color-paper-2));
+}
+
+/* The one under the cursor. Solid enough that the answer is never "which of
+   these five did I mean". */
+.dragging-bot [data-zone][data-droppable='yes'][data-over] > div {
+  border-color: var(--color-go);
+  border-style: dashed;
+  background: color-mix(in oklab, var(--color-go) 18%, var(--color-paper-2));
+}
+
+.dragging-bot [data-zone][data-droppable='yes'][data-over] .zone-name {
+  color: var(--color-go);
+}

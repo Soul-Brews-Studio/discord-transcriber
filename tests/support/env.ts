@@ -1,0 +1,1 @@
+process.env.FOLLOW_USER_ID ??= '100000000000000001';
